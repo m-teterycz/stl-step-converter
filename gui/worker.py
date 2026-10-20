@@ -6,20 +6,46 @@ from core.face import Face
 from core.step_writer import (CartesianPoint,Direction,VertexPoint,Line,Vector,EdgeCurve,OrientedEdge,EdgeLoop,FaceOuterBound,AXIS2_PLACEMENT_3D,Normal,Plane,AdvancedFace,ClosedShell,ManifoldSolidBrep,FaceBound,)
 
 from core import geometry_math
-import time
+import psutil, os
+
+
+
+
+
+process = psutil.Process(os.getpid())
+
+def show_memory(stage):
+    memory_gb = process.memory_info().rss / (1024 ** 3)
+    print(f"{stage}: {memory_gb:.2f} GB RAM")
+
+
+
 
 def stl_to_step(directory, file_name, prefix, units):
     data = stl_reader.read_data(directory + f"\\{file_name}.stl")
+    show_memory("After reading STL")
     triangles = triangle.create_triangles(data)
+    show_memory("After creating triangles")
+
+    del data
+    show_memory("After deleting STL data")
 
     mesh = Mesh(triangles) # 10 seconds
+    show_memory("After creating mesh")
     mesh.find_neighbours()
+    show_memory("After finding neighbours")
 
     co_planar_groups = mesh.find_all_planar_regions()
+    show_memory("After finding co-planar regions")
 
     for i in range(len(co_planar_groups)):
         face = Face(co_planar_groups[i])
         mesh.faces.append(face)
+
+    for triangle1 in triangles:
+        triangle1.edges = None
+    del co_planar_groups
+
 
     stepwriter = StepWriter(mesh, prefix, units, file_name, 'desc')
 
@@ -94,16 +120,15 @@ def stl_to_step(directory, file_name, prefix, units):
         for loop_index, edge_loop_id in enumerate(Edge_Loop_Ids):
             if loop_index == face.outer_loop:
                 boundary = FaceOuterBound(edge_loop_id)
+                stepwriter.register(boundary)
                 stepwriter.faceouterbound_registry[boundary] = boundary.id
+
             else:
                 boundary = FaceBound(edge_loop_id)
+                stepwriter.register(boundary)
                 stepwriter.facebound_registry[boundary] = boundary.id
 
-            stepwriter.register(boundary)
             boundary_ids.append(boundary.id)
-
-        
-
 
         Axis2_Placement_3D = AXIS2_PLACEMENT_3D(stepwriter.cartesian_registry[face.vertices[0]], stepwriter.normal_registry[face.normal], stepwriter.direction_registry[frozenset(face.edges[0])])
         stepwriter.register(Axis2_Placement_3D)

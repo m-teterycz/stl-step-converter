@@ -2,7 +2,7 @@ import sys
 import ctypes
 from pathlib import Path
 
-from PySide6 import QtWidgets, QtGui, QtCore
+from PySide6 import QtWidgets, QtGui
 from gui import worker
 
 if sys.platform == "win32":

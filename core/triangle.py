@@ -1,15 +1,18 @@
 from core import geometry_math
+import numpy
 
 class Triangle:
     def __init__(self, vertices):
-        self.normal = None
         self.vertices = vertices
         self.neighbours = []
         self.edges = []
-        temp_vert = []
+        temp_vert = [] 
 
-        for vertex in self.vertices:
-            temp_vert.append((float(vertex[0]), float(vertex[1]), float(vertex[2])))
+        i = 0
+
+        while i != len(self.vertices):
+            temp_vert.append((float(self.vertices[i]), float(self.vertices[i + 1]), float(self.vertices[i + 2])))
+            i += 3
 
         self.vertices = tuple(temp_vert)
 
@@ -45,8 +48,8 @@ class Triangle:
 def create_triangles(data):
     triangles = []
     
-    for i in range(0, len(data), 3):
-        triangle = Triangle(tuple(data[i:i + 3]))
+    for i in range(0, len(data), 9):
+        triangle = Triangle(tuple(data[i:i + 9]))
         triangles.append(triangle)
 
     return triangles

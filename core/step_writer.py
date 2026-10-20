@@ -263,7 +263,7 @@ class ManifoldSolidBrep(StepEntity):
         self.closed_shell = closed_shell
 
     def get_step_string(self):
-        return f"#{self.id} = MANIFOLD_SOLID_BREP({"'"+self.name+"'"}, #{self.closed_shell});\n"
+        return f"#{self.id} = MANIFOLD_SOLID_BREP('{self.name}', #{self.closed_shell});\n"
 
 class ApplicationContext(StepEntity):
     def __init__(self, description):
@@ -271,7 +271,7 @@ class ApplicationContext(StepEntity):
         self.description = description
 
     def get_step_string(self):
-        return f"#{self.id} = APPLICATION_CONTEXT({"'"+self.description+"'"});\n"
+        return f"#{self.id} = APPLICATION_CONTEXT('{self.description}');\n"
 
 class ApplicationProtocolDefinition(StepEntity):
 
